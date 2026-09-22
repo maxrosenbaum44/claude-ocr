@@ -1,6 +1,6 @@
 ---
 name: ocr
-description: Turn any PDF, scanned document, image, or PDF URL into clean Markdown that Claude can read. Use whenever the user hands over a PDF or image (course readings, scans, screenshots of text, contracts, bank statements, slide decks) or asks to OCR, extract, read, or summarize one. Auto-picks the fastest engine (text layer -> Marker -> Tesseract) and flags pages Claude should look at with its own vision.
+description: Turn any PDF, scanned document, image, or PDF URL into clean Markdown that Claude can read. Use whenever the user hands over a PDF or image (course readings, scans, screenshots of text, contracts, statements, slide decks) or asks to OCR, extract, read, or summarize one. Auto-picks the fastest engine (text layer -> Tesseract -> RapidOCR) and flags pages Claude should read with its own vision.
 ---
 
 # /ocr - PDF and image to Markdown
@@ -8,7 +8,7 @@ description: Turn any PDF, scanned document, image, or PDF URL into clean Markdo
 ## Run it
 
 ```bash
-"$OCR_PY" "$OCR_SCRIPT" <file-or-url> [--pages 1-5] [--engine auto|text|marker|tesseract] [--images] [--out DIR]
+"$OCR_PY" "$OCR_SCRIPT" <file-or-url> [--pages 1-5] [--engine auto|text|tesseract|rapid] [--images] [--out DIR]
 ```
 
 Resolve the two paths once per session:
@@ -18,7 +18,7 @@ Resolve the two paths once per session:
 - `OCR_SCRIPT=$HOME/claude-ocr/skill/scripts/ocr.py`
 
 If `$HOME/claude-ocr` is missing, tell the user to run the install script from
-https://github.com/maxrosenbaum44/claude-ocr (one command, ~5 min, free).
+https://github.com/maxrosenbaum44/claude-ocr (one command, ~2 min, free).
 
 ## Then
 
@@ -33,11 +33,11 @@ https://github.com/maxrosenbaum44/claude-ocr (one command, ~5 min, free).
 ## Engine choice
 
 - `auto` (default): PDFs with a real text layer skip OCR entirely (<1 s).
-  Scans go to Marker (layout-aware, tables, columns, math). First Marker run
-  downloads ~1.5 GB of models; later runs take ~20 s to load plus ~3-6 s/page on CPU.
-- `--engine marker` on a text-layer PDF when layout matters (multi-column
-  papers, tables) and plain extraction came out scrambled.
-- `--engine tesseract`: fast, lower quality, only if Marker is broken.
+  Scans go to Tesseract (~1 s/page, good on clean scans).
+- `--engine rapid`: RapidOCR, ~20-30 s/page on CPU. Use for phone photos,
+  skewed or low-contrast scans, or when Tesseract output is garbage.
+- `--images`: write a PNG for every page. Use when layout matters (tables,
+  multi-column) and you want to eyeball pages yourself.
 - Use `--pages` for long documents. Do the pages the question needs, not all 300.
 
 ## Canvas and other login-walled PDFs
@@ -50,4 +50,4 @@ Download, save it locally, then run the script on the local path.
 ## Do not
 
 - Do not paste 40 pages of Markdown back to the user. Answer the question.
-- Do not run Marker on a whole textbook without `--pages`.
+- Do not run `rapid` on a whole textbook without `--pages`.

@@ -1,9 +1,5 @@
-# Marker 1.x: pure-PyTorch OCR. Marker 2.x switched recognition to a llama.cpp
-# server binary that must be installed separately (and Windows Smart App Control
-# blocks unsigned binaries), so stay on 1.x for a zero-upkeep install.
-marker-pdf>=1.10,<2
-surya-ocr>=0.16,<0.17
+# Deliberately small: no PyTorch, no model downloads, nothing hosted by a third
+# party that can move. onnxruntime wheels are Microsoft-signed, so they pass
+# Windows Smart App Control; RapidOCR bundles its models inside the wheel.
 pymupdf>=1.24
-# scikit-learn 1.9.x wheels ship an unsigned _splitter.pyd that Windows Smart
-# App Control blocks; 1.6.1 wheels pass.
-scikit-learn==1.6.1
+rapidocr-onnxruntime>=1.4

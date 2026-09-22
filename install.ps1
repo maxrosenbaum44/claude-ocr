@@ -17,20 +17,17 @@ if (-not (Test-Path $py)) { python -m venv $venv }
 & $py -m pip install --upgrade pip -q
 & $py -m pip install -r (Join-Path $root "requirements.txt") -q
 
-# Tesseract fallback (optional, ~50 MB)
+# Tesseract (signed installer, ~50 MB)
 if (-not (Test-Path "C:\Program Files\Tesseract-OCR\tesseract.exe")) {
-    try { winget install --id UB-Mannheim.TesseractOCR --source winget --accept-package-agreements --accept-source-agreements --silent | Out-Null } catch {}
+    winget install --id UB-Mannheim.TesseractOCR --source winget --accept-package-agreements --accept-source-agreements --silent | Out-Null
 }
 
 # Link the skill into Claude Code's user skills dir
 $skills = Join-Path $HOME ".claude\skills"
 New-Item -ItemType Directory -Force $skills | Out-Null
 $link = Join-Path $skills "ocr"
-if (Test-Path $link) { Remove-Item $link -Recurse -Force }
+if (Test-Path $link) { cmd /c rmdir "$link" | Out-Null }
 cmd /c mklink /J "$link" "$(Join-Path $root 'skill')" | Out-Null
 
-# Warm the Marker model cache so the first real run is fast
-Write-Host "Downloading Marker models (one time, ~1.5 GB)..."
-& $py -c "from marker.models import create_model_dict; create_model_dict(); print('models cached')"
-
-Write-Host "`nInstalled. In any Claude Code session: /ocr <file-or-url>"
+& $py -c "import pymupdf, rapidocr_onnxruntime; print('python deps ok')"
+Write-Host "Installed. In any Claude Code session: /ocr <file-or-url>"

@@ -1,0 +1,4 @@
+marker-pdf>=2.0
+pymupdf>=1.24
+# 1.9.x wheels are blocked by Windows Smart App Control (unsigned _splitter.pyd)
+scikit-learn==1.6.1
